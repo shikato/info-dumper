@@ -247,8 +247,10 @@ public class InfoDumperPlugin implements DumperPlugin {
     private void dumpIds(DumperContext dumperContext) throws DumpException {
         PrintStream writer = dumperContext.getStdout();
 
-        // TODO: エミュ対応
         String androidId = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
+        if (androidId == null) {
+            androidId = "null";
+        }
         String uuid = UUID.randomUUID().toString();
         String adId = null;
         boolean isAdOptout = false;
