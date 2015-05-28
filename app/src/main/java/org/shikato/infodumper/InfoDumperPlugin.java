@@ -157,6 +157,14 @@ public class InfoDumperPlugin implements DumperPlugin {
                 writer.println("[REQUESTED PERMISSIONS]");
             }
 
+            if (packageInfo == null || packageInfo.requestedPermissions == null) {
+                writer.println("No requested permission."); 
+                if (mIsAll) {
+                    writer.println("");
+                } 
+                return;
+            }
+
             for (String permission : packageInfo.requestedPermissions) {
                 writer.println(permission);
             }
