@@ -2,7 +2,8 @@
 info-dumper is a Stetho plugin which show your android application's information.  
 [stetho](http://facebook.github.io/stetho/)
 
-スクショ 
+![screen gif](http://38.media.tumblr.com/aa7134963258048bfe1758fbaa821111/tumblr_np2dmkXiOC1ro6w1ho1_500.gif)
+
 
 ## Download 
 
