@@ -1,23 +1,28 @@
 # info-dumper
-info-dumper is a [Stetho](http://facebook.github.io/stetho/) plugin which show your android application's information.  
+info-dumper is a [Stetho](http://facebook.github.io/stetho/) plugin which shows your android application's information.  
 
 ![screen gif](http://38.media.tumblr.com/aa7134963258048bfe1758fbaa821111/tumblr_np2dmkXiOC1ro6w1ho1_500.gif)
 
 
 ## Download 
 
-Gradle
+build.gradle
 ``` groovy
 repositories {
-    mavenCentral()
-    # github url
+    maven {
+	    url "https://jitpack.io"
+	}
 } 
 
-compile ''
+dependencies {
+    compile 'com.github.shikato:info-dumper:0.0.1'
+}
 ``` 
 
 ## Setup 
-Application class
+[Stetho's setup](http://facebook.github.io/stetho/).
+
+Application Class
 ```java
   @Override
   public void onCreate() {
