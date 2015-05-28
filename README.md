@@ -20,7 +20,7 @@ dependencies {
 ``` 
 
 ## Setup 
-[Stetho's setup](]http://facebook.github.io/stetho/).
+[Stetho's setup](http://facebook.github.io/stetho/).
 
 Application Class
 ```java
