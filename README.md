@@ -15,7 +15,7 @@ repositories {
 } 
 
 dependencies {
-    compile 'com.github.shikato:info-dumper:0.0.1'
+    compile 'com.github.shikato:info-dumper:0.0.2'
 }
 ``` 
 
