@@ -20,7 +20,9 @@ dependencies {
 ``` 
 
 ## Setup 
-Application class
+[Stetho's setup](]http://facebook.github.io/stetho/).
+
+Application Class
 ```java
   @Override
   public void onCreate() {
