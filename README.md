@@ -9,11 +9,14 @@ info-dumper is a [Stetho](http://facebook.github.io/stetho/) plugin which show y
 Gradle
 ``` groovy
 repositories {
-    mavenCentral()
-    # github url
+    maven {
+	    url "https://jitpack.io"
+	}
 } 
 
-compile ''
+dependencies {
+    compile 'com.github.shikato:info-dumper:0.0.1'
+}
 ``` 
 
 ## Setup 
