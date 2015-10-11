@@ -38,7 +38,7 @@ Application Class
   private static class MyDumperPluginsProvider implements DumperPluginsProvider {
     private final Context mContext;
 
-    public SampleDumperPluginsProvider(Context context) {
+    public MyDumperPluginsProvider(Context context) {
       mContext = context;
     }
 
