@@ -80,6 +80,8 @@ dumpapp info id
 | all    |     It shows all. |
 
 
+## Documents
+[Qiita](http://qiita.com/shikato/items/50e23e64aacbeb49c172)
 
 ## License
 MIT
