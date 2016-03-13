@@ -1,4 +1,4 @@
-package org.shikato.indodumper.sample;
+package org.shikato.infodumper.sample;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
