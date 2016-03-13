@@ -1,9 +1,7 @@
 package org.shikato.infodumper.sample;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
-import org.shikato.sampleapplication.R;
+import android.support.v7.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
