@@ -25,6 +25,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.1'
 
     debugCompile project(path: ':library', configuration: 'debug');
-    // TODO: from jcenter
-    releaseCompile project(path: ':library', configuration: 'release');
+    releaseCompile 'org.shikato.infodumper:bintray-release:0.0.3'
 }
