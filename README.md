@@ -54,6 +54,7 @@ dependencies {
     }
   }
 ``` 
+https://bintray.com/shikato/maven/info-dumper/view
 
 ## Usage 
 
