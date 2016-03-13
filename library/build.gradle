@@ -37,6 +37,6 @@ publish {
     groupId = 'org.shikato.infodumper'
     artifactId = 'info-dumper'
     publishVersion = version
-    desc = "Info-dumper is a Stetho plugin to shows your android application's information."
+    desc = "Info-dumper is a Stetho plugin to show your android application's information."
     website = 'https://github.com/shikato/info-dumper'
 }
