@@ -1,3 +1,5 @@
+  [ ![Download](https://api.bintray.com/packages/shikato/maven/info-dumper/images/download.svg) ](https://bintray.com/shikato/maven/info-dumper/_latestVersion)
+
 # info-dumper
 Info-dumper is a [Stetho](http://facebook.github.io/stetho/) plugin to show your android application's information.  
 
