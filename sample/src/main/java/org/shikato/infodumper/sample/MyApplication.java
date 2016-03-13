@@ -10,6 +10,7 @@ import com.facebook.stetho.dumpapp.DumperPlugin;
 import org.shikato.infodumper.InfoDumperPlugin;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MyApplication extends Application {
     @Override
@@ -31,7 +32,7 @@ public class MyApplication extends Application {
 
         @Override
         public Iterable<DumperPlugin> get() {
-            ArrayList<DumperPlugin> plugins = new ArrayList<>();
+            List<DumperPlugin> plugins = new ArrayList<>();
             for (DumperPlugin defaultPlugin : Stetho.defaultDumperPluginsProvider(mContext).get()) {
                 plugins.add(defaultPlugin);
             }
