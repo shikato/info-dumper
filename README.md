@@ -18,6 +18,7 @@ dependencies {
     compile 'org.shikato.infodumper:info-dumper:0.0.3'
 }
 ``` 
+https://bintray.com/shikato/maven/info-dumper/view
 
 ## Setup 
 [Stetho's setup](http://facebook.github.io/stetho/).
