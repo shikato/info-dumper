@@ -53,9 +53,7 @@ public class IdsDumper implements InfoDumper {
     }
 
     private String getAndroidId(Context context) {
-        String androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        if (androidId != null) return androidId;
-        return null;
+        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
     private String getUUID() {
