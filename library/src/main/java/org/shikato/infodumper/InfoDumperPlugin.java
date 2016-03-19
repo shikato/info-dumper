@@ -1,35 +1,31 @@
 package org.shikato.infodumper;
 
-import android.Manifest;
-import android.app.ActivityManager;
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.provider.Settings;
-import android.telephony.TelephonyManager;
-import android.text.TextUtils;
-import android.util.DisplayMetrics;
-import android.view.WindowManager;
 
 import com.facebook.stetho.dumpapp.ArgsHelper;
 import com.facebook.stetho.dumpapp.DumpException;
 import com.facebook.stetho.dumpapp.DumpUsageException;
 import com.facebook.stetho.dumpapp.DumperContext;
 import com.facebook.stetho.dumpapp.DumperPlugin;
-import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
-import java.io.IOException;
+import org.shikato.infodumper.dump.ApplicationInfoDumper;
+import org.shikato.infodumper.dump.BuildConfigDumper;
+import org.shikato.infodumper.dump.DpiDumper;
+import org.shikato.infodumper.dump.ErrorDumper;
+import org.shikato.infodumper.dump.IdsDumper;
+import org.shikato.infodumper.dump.InfoDumper;
+import org.shikato.infodumper.dump.LastUpdateDumper;
+import org.shikato.infodumper.dump.MemoryDumper;
+import org.shikato.infodumper.dump.NetworkDumper;
+import org.shikato.infodumper.dump.OsBuildDumper;
+import org.shikato.infodumper.dump.PermissionDumper;
+import org.shikato.infodumper.dump.TelDumper;
+
 import java.io.PrintStream;
-import java.lang.reflect.Field;
-import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 public class InfoDumperPlugin implements DumperPlugin {
 
@@ -43,16 +39,9 @@ public class InfoDumperPlugin implements DumperPlugin {
     private static final String CMD_NETWORK = "network";
     private static final String CMD_ERROR = "error";
     private static final String CMD_TEL = "tel";
-
-    // PackageInfo系
     private static final String CMD_PERMISSION = "permission";
     private static final String CMD_LAST_UPDATE = "lastupdate";
-
-    // AppInfo系
-    // TODO: 細分化する
     private static final String CMD_APPLICATION_INFO = "appinfo";
-    // OsBuild系
-    // TODO: 細分化する
     private static final String CMD_OS_BUILD = "osbuild";
 
     private Context mContext = null;
@@ -69,12 +58,13 @@ public class InfoDumperPlugin implements DumperPlugin {
         return NAME;
     }
 
-    // getNameで指定したコマンドを実行したときに呼ばれるメソッド
+    // getNameで指定したコマンドを実行したときに呼ばれる
     @Override
     public void dump(DumperContext dumperContext) throws DumpException {
-        Iterator<String> argsIter = dumperContext.getArgsAsList().iterator();
+        Iterator<String> argsIterator = dumperContext.getArgsAsList().iterator();
 
-        String command = ArgsHelper.nextOptionalArg(argsIter, null);
+        String command = ArgsHelper.nextOptionalArg(argsIterator, null);
+
         mIsAll = false;
 
         if (CMD_BUILD_CONFIG.equalsIgnoreCase(command)) {
@@ -121,349 +111,99 @@ public class InfoDumperPlugin implements DumperPlugin {
     }
 
     private void dumpBuildConfig(DumperContext dumperContext) throws DumpException {
-        PrintStream writer = dumperContext.getStdout();
-
-        try {
-            Class buildConfig = Class.forName(mContext.getPackageName() + ".BuildConfig");
-
-            if (mIsAll) {
-                writer.println("[BUILD CONFIG]");
-            }
-
-            for (Field field : buildConfig.getDeclaredFields()) {
-                field.setAccessible(true);
-                writer.println(field.getName() + ": " + field.get(null));
-            }
-
-            if (mIsAll) {
-                writer.println("");
-            }
-        } catch (ClassNotFoundException e) {
-            throw new DumpException(e.getMessage());
-        } catch (IllegalAccessException e) {
-            throw new DumpException(e.getMessage());
-        }
+        dumpTypeMap(dumperContext, new BuildConfigDumper());
     }
 
     private void dumpPermission(DumperContext dumperContext) throws DumpException {
-        PrintStream writer = dumperContext.getStdout();
-        PackageManager packageManager = mContext.getPackageManager();
-
-        try {
-            PackageInfo packageInfo =
-                    packageManager.getPackageInfo(mContext.getPackageName(), PackageManager.GET_PERMISSIONS);
-
-            if (mIsAll) {
-                writer.println("[REQUESTED PERMISSIONS]");
-            }
-
-            if (packageInfo == null || packageInfo.requestedPermissions == null) {
-                writer.println("No requested permission."); 
-                if (mIsAll) {
-                    writer.println("");
-                } 
-                return;
-            }
-
-            for (String permission : packageInfo.requestedPermissions) {
-                writer.println(permission);
-            }
-
-            if (mIsAll) {
-                writer.println("");
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            throw new DumpException(e.getMessage());
-        }
+        dumpTypeList(dumperContext, new PermissionDumper());
     }
 
     private void dumpLastUpdate(DumperContext dumperContext) throws DumpException {
-        PrintStream writer = dumperContext.getStdout();
-        PackageManager packageManager = mContext.getPackageManager();
-
-        try {
-            PackageInfo packageInfo = packageManager.getPackageInfo(mContext.getPackageName(), 0);
-
-            if (mIsAll) {
-                writer.println("[LAST UPDATE]");
-            }
-
-            writer.println(new Date(packageInfo.lastUpdateTime));
-
-            if (mIsAll) {
-                writer.println("");
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            throw new DumpException(e.getMessage());
-        }
+        dumpTypeList(dumperContext, new LastUpdateDumper());
     }
 
     private void dumpApplicationInfo(DumperContext dumperContext) throws DumpException {
-        PrintStream writer = dumperContext.getStdout();
-        PackageManager packageManager = mContext.getPackageManager();
-
-        try {
-            ApplicationInfo appInfo = packageManager.getApplicationInfo(mContext.getPackageName(), 0);
-            Class applicationInfo = Class.forName(appInfo.getClass().getName());
-
-            if (mIsAll) {
-                writer.println("[APPLICATION INFO]");
-            }
-
-            for (Field field : applicationInfo.getDeclaredFields()) {
-                field.setAccessible(true);
-                writer.println(field.getName() + ": " + field.get(appInfo));
-            }
-
-            if (mIsAll) {
-                writer.println("");
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            throw new DumpException(e.getMessage());
-        } catch (ClassNotFoundException e) {
-            throw new DumpException(e.getMessage());
-        } catch (IllegalAccessException e) {
-            throw new DumpException(e.getMessage());
-        }
+        dumpTypeMap(dumperContext, new ApplicationInfoDumper());
     }
 
     private void dumpOsBuild(DumperContext dumperContext) throws DumpException {
-        PrintStream writer = dumperContext.getStdout();
-
-        try {
-            Class osBuild = Class.forName("android.os.Build");
-
-            if (mIsAll) {
-                writer.println("[OS BUILD]");
-            }
-
-            for (Field field : osBuild.getDeclaredFields()) {
-                field.setAccessible(true);
-                writer.println(field.getName() + ": " + field.get(null));
-            }
-
-            if (mIsAll) {
-                writer.println("");
-            }
-        } catch (ClassNotFoundException e) {
-            throw new DumpException(e.getMessage());
-        } catch (IllegalAccessException e) {
-            throw new DumpException(e.getMessage());
-        }
+        dumpTypeMap(dumperContext, new OsBuildDumper());
     }
 
     private void dumpIds(DumperContext dumperContext) throws DumpException {
-        PrintStream writer = dumperContext.getStdout();
-
-        String androidId = Settings.Secure.getString(mContext.getContentResolver(), Settings.Secure.ANDROID_ID);
-        if (androidId == null) {
-            androidId = "null";
-        }
-        String uuid = UUID.randomUUID().toString();
-        String adId = null;
-        boolean isAdOptout = false;
-        boolean isGrantedNetworkPermission = false;
-
-        int permissionInfo =
-                mContext.getPackageManager().checkPermission(Manifest.permission.INTERNET, mContext.getPackageName());
-
-        if(permissionInfo == PackageManager.PERMISSION_GRANTED) {
-            isGrantedNetworkPermission = true;
-            try {
-                AdvertisingIdClient.Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(mContext);
-                adId = adInfo.getId();
-                isAdOptout = adInfo.isLimitAdTrackingEnabled();
-            } catch (IOException e) {
-                throw new DumpException(e.getMessage());
-            } catch (GooglePlayServicesNotAvailableException e) {
-                throw new DumpException(e.getMessage());
-            } catch (GooglePlayServicesRepairableException e) {
-                throw new DumpException(e.getMessage());
-            }
-        }
-
-        if (mIsAll) {
-            writer.println("[ID]");
-        }
-
-        writer.println(Settings.Secure.ANDROID_ID + ": " + androidId);
-        writer.println("UUID: " + uuid);
-
-        if (isGrantedNetworkPermission) {
-            if (!TextUtils.isEmpty(adId)) {
-                writer.println("AdvertisingId: " + adId);
-                writer.println("isAdOptout: " + Boolean.toString(isAdOptout));
-            }
-        } else {
-            writer.println("Getting AdvertisingId need a android.permission.INTERNET");
-        }
-
-        if (mIsAll) {
-            writer.println("");
-        }
+        dumpTypeMap(dumperContext, new IdsDumper());
     }
 
     private void dumpDpi(DumperContext dumperContext) throws DumpException {
-        PrintStream writer = dumperContext.getStdout();
-
-        WindowManager wm = (WindowManager)mContext.getSystemService( Context.WINDOW_SERVICE );
-        android.view.Display disp = wm.getDefaultDisplay();
-        DisplayMetrics metrics = new DisplayMetrics();
-        disp.getMetrics(metrics);
-        int dpi = metrics.densityDpi;
-
-        String result = "";
-        if (dpi <= 120 ) {
-            result = "ldpi";
-        } else if (dpi <= 160) {
-            result = "mdpi";
-        } else if (dpi <= 240) {
-            result = "hdpi";
-        } else if (dpi <= 320) {
-            result = "xhdpi";
-        } else if (dpi <= 480) {
-            result = "xxhdpi";
-        } else {
-            result = "xxxhdpi";
-        }
-
-        if (mIsAll) {
-            writer.println("[DPI]");
-        }
-
-        writer.println("dpi: " + Integer.toString(dpi));
-        writer.println("Generalized density: " + result);
-        writer.println("widthPixels: " + Integer.toString(metrics.widthPixels));
-        writer.println("heightPixels: " + Integer.toString(metrics.heightPixels));
-
-        if (mIsAll) {
-            writer.println("");
-        }
+        dumpTypeMap(dumperContext, new DpiDumper());
     }
 
-    private void dumpMemory(DumperContext dumperContext) {
-        PrintStream writer = dumperContext.getStdout();
-
-        ActivityManager activityManager = ((ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE));
-        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
-        activityManager.getMemoryInfo(memoryInfo);
-
-        if (mIsAll) {
-            writer.println("[MEMORY]");
-        }
-
-        writer.println("MemoryInfo availMem: " + memoryInfo.availMem);
-        writer.println("MemoryInfo lowMemory: " + memoryInfo.lowMemory);
-        writer.println("MemoryInfo threshold: " + memoryInfo.threshold);
-
-        if (mIsAll) {
-            writer.println("");
-        }
+    private void dumpMemory(DumperContext dumperContext) throws DumpException {
+        dumpTypeMap(dumperContext, new MemoryDumper());
     }
 
-    private void dumpError(DumperContext dumperContext) {
+    private void dumpError(DumperContext dumperContext) throws DumpException {
+        dumpTypeMap(dumperContext, new ErrorDumper());
+    }
+
+    private void dumpNetwork(DumperContext dumperContext) throws DumpException {
+        dumpTypeMap(dumperContext, new NetworkDumper());
+    }
+
+    private void dumpTel(DumperContext dumperContext) throws DumpException {
+        dumpTypeMap(dumperContext, new TelDumper());
+    }
+
+    private void dumpTypeMap(DumperContext dumperContext, InfoDumper dumper) throws DumpException {
         PrintStream writer = dumperContext.getStdout();
 
-        ActivityManager activityManager = ((ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE));
-        List<ActivityManager.ProcessErrorStateInfo> errorStateInfo = activityManager.getProcessesInErrorState();
-
         if (mIsAll) {
-            writer.println("[ERROR]");
+            writer.println("[" + dumper.getTitle() + "]");
         }
 
-        if (errorStateInfo == null) {
-            writer.println("No Error");
+        LinkedHashMap<String, String> dumps = dumper.getDumpMap(mContext);
+        if (dumps == null) {
+            writer.println(dumper.getErrorMessage());
             if (mIsAll) {
                 writer.println("");
             }
             return;
         }
 
-        for (ActivityManager.ProcessErrorStateInfo error : errorStateInfo) {
-            writer.println("Error.condition: " + error.condition); // CRASHED,NOT_RESPONDING,NO_ERROR
-            writer.println("Error.longMsg: " + error.longMsg);
-            writer.println("Error.shortMsg: " + error.shortMsg);
-            writer.println("Error.pid: " + error.pid);
-            writer.println("Error.processName: " + error.processName);
-            writer.println("Error.stackTrace : " + error.stackTrace);
-            writer.println("Error.tag: " + error.tag);
-            writer.println("Error.uid: " + error.uid);
+        for (Map.Entry<String, String> e : dumps.entrySet()) {
+            writer.println(e.getKey() + ": " + e.getValue());
         }
 
         if (mIsAll) {
             writer.println("");
         }
+
     }
 
-    private void dumpNetwork(DumperContext dumperContext) {
+    private void dumpTypeList(DumperContext dumperContext, InfoDumper dumper) throws DumpException {
         PrintStream writer = dumperContext.getStdout();
 
         if (mIsAll) {
-            writer.println("[NETWORK]");
+            writer.println("[" + dumper.getTitle() + "]");
         }
 
-        int permissionInfo =
-                mContext.getPackageManager().checkPermission(Manifest.permission.ACCESS_NETWORK_STATE, mContext.getPackageName());
-
-        if(permissionInfo == PackageManager.PERMISSION_DENIED) {
-            writer.println("Need a permission: android.permission.ACCESS_NETWORK_STATE");
+        List<String> dumps = dumper.getDumpList(mContext);
+        if (dumps == null) {
+            writer.println(dumper.getErrorMessage());
             if (mIsAll) {
                 writer.println("");
             }
             return;
         }
 
-        ConnectivityManager connectivity =
-                (ConnectivityManager)mContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo network = connectivity.getActiveNetworkInfo();
-
-        if (network == null) {
-            writer.println("NetworkInfo: connection disactive");
-        } else if (!network.isAvailable()) {
-            writer.println("NetworkInfo: connection not available");
-        } else if (!network.isConnectedOrConnecting()) {
-            writer.println("NetworkInfo: not connect.");
-        } else {
-            writer.println("NetworkInfo: " + network.getTypeName());
+        for (String dump : dumps) {
+            writer.println(dump);
         }
 
         if (mIsAll) {
             writer.println("");
         }
-    }
 
-    private void dumpTel(DumperContext dumperContext) {
-        PrintStream writer = dumperContext.getStdout();
-
-        if (mIsAll) {
-            writer.println("[TEL]");
-        }
-
-        int permissionInfo =
-                mContext.getPackageManager().checkPermission(Manifest.permission.READ_PHONE_STATE, mContext.getPackageName());
-
-        if(permissionInfo == PackageManager.PERMISSION_DENIED) {
-            writer.println("Need a permission: android.permission.READ_PHONE_STATE");
-            if (mIsAll) {
-                writer.println("");
-            }
-            return;
-        }
-
-        TelephonyManager telephonyManager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
-
-        writer.println("Line1Number: " + telephonyManager.getLine1Number());
-        writer.println("DeviceId: " + telephonyManager.getDeviceId());
-        writer.println("SimCountryIso: " + telephonyManager.getSimCountryIso());
-        writer.println("SimOperator: " + telephonyManager.getSimOperator());
-        writer.println("SimOperatorName: " + telephonyManager.getSimOperatorName());
-        writer.println("SimSerialNumber: " + telephonyManager.getSimSerialNumber());
-        writer.println("SimState: " + telephonyManager.getSimState());
-        writer.println("VoiceMailNumber: " + telephonyManager.getVoiceMailNumber());
-
-        if (mIsAll) {
-            writer.println("");
-        }
     }
 
     private void usage(DumperContext dumperContext) {

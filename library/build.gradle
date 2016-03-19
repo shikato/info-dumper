@@ -2,7 +2,8 @@ apply plugin: 'android-library'
 apply plugin: 'android-maven'
 apply plugin: 'com.novoda.bintray-release'
 
-def version = '0.0.3';
+def myVersionName = '0.0.4';
+def myVersionCode = 4;
 
 android {
     compileSdkVersion 22
@@ -13,8 +14,8 @@ android {
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 22
-        versionCode 3
-        versionName version
+        versionCode myVersionCode
+        versionName myVersionName
     }
     buildTypes {
         release {
@@ -31,12 +32,11 @@ dependencies {
     compile "com.google.android.gms:play-services-ads:8.4.0"
 }
 
-
 publish {
     userOrg = 'shikato'
     groupId = 'org.shikato.infodumper'
     artifactId = 'info-dumper'
-    publishVersion = version
+    publishVersion = myVersionName
     desc = "Info-dumper is a Stetho plugin to show your android application's information."
     website = 'https://github.com/shikato/info-dumper'
 }
