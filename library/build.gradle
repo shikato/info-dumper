@@ -31,7 +31,6 @@ dependencies {
     compile "com.google.android.gms:play-services-ads:8.4.0"
 }
 
-
 publish {
     userOrg = 'shikato'
     groupId = 'org.shikato.infodumper'
