@@ -17,7 +17,7 @@ repositories {
 } 
 
 dependencies {
-    compile 'org.shikato.infodumper:info-dumper:0.0.3'
+    compile 'org.shikato.infodumper:info-dumper:0.0.4'
 }
 ``` 
 https://bintray.com/shikato/maven/info-dumper/view
