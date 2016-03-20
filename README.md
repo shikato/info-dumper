@@ -23,7 +23,7 @@ dependencies {
 https://bintray.com/shikato/maven/info-dumper/view
 
 ## Setup 
-[Stetho's setup](http://facebook.github.io/stetho/).
+[Stetho dumpapp setup](http://facebook.github.io/stetho/) is necessary at first.
 
 **Your Application Class**
 ```java
@@ -83,7 +83,7 @@ dumpapp info buildconf
 | all    |     all |
 
 
-## Documents
+## Other documents
 [Qiita](http://qiita.com/shikato/items/50e23e64aacbeb49c172)
 
 ## License
