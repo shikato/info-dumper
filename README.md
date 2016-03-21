@@ -10,12 +10,6 @@ Info-dumper is a [Stetho](http://facebook.github.io/stetho/) dumpapp plugin to s
 
 **build.gradle**
 ``` groovy
-repositories {
-    maven {
-        url 'http://dl.bintray.com/shikato/maven'
-    }
-} 
-
 dependencies {
     compile 'org.shikato.infodumper:info-dumper:0.0.4'
 }
