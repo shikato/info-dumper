@@ -25,5 +25,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.1'
 
     debugCompile project(path: ':library', configuration: 'debug');
-    releaseCompile 'org.shikato.infodumper:info-dumper:0.0.3'
+    releaseCompile 'org.shikato.infodumper:info-dumper:0.0.4'
 }
